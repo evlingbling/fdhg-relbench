@@ -1,0 +1,106 @@
+tasks:
+  rel-ratebeer/user-count:
+    builder: generic_dfs
+    inspect_task: user-count
+    problem_type: regression
+    label_col: num_ratings
+    target:
+      entity_key: user_id
+      time_col: timestamp
+    dfs:
+      child_table: beer_ratings
+      child_time_col: created_at
+      numeric_col: aroma
+      max_train: 10000
+      max_val: 2000
+    evaluation:
+      drop_cols:
+      - timestamp
+      - user_id
+    expected_gate: select
+    candidate_programs:
+    - program_id: baseline_corrected_canonical
+      primitive_ids:
+      - baseline::count
+      - baseline::numeric_mean
+      - baseline::numeric_std
+      - baseline::numeric_max
+      - baseline::days_since_last
+      description: Corrected canonical DFS baseline smoke candidate.
+    prepared_artifacts:
+      train_target:
+        dataset: rel-ratebeer
+        task: user-count
+        split: train
+        role: target
+        table: user_count_baseline_corrected_canonical
+        path: ../../outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/target_with_dfs_agg_train.parquet
+      validation_target:
+        dataset: rel-ratebeer
+        task: user-count
+        split: validation
+        role: target
+        table: user_count_baseline_corrected_canonical
+        path: ../../outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/target_with_dfs_agg_val.parquet
+      source_tables: {}
+      lowering_evidence:
+      - dataset: rel-ratebeer
+        task: user-count
+        program_id: baseline_corrected_canonical
+        primitive_id: baseline::count
+        source_table: user_count_baseline_corrected_canonical
+        source_column: f_beer_ratings_count
+        output_column: f_beer_ratings_count
+        status: proven
+        notes:
+        - src/fdhg/compiler/existing_backend.py:RATEBEER_BASELINE_BINDINGS
+        - outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/dfs_feature_config.json
+        - outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/dfs_feature_manifest.csv
+      - dataset: rel-ratebeer
+        task: user-count
+        program_id: baseline_corrected_canonical
+        primitive_id: baseline::numeric_mean
+        source_table: user_count_baseline_corrected_canonical
+        source_column: f_beer_ratings_aroma_mean
+        output_column: f_beer_ratings_aroma_mean
+        status: proven
+        notes:
+        - src/fdhg/compiler/existing_backend.py:RATEBEER_BASELINE_BINDINGS
+        - outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/dfs_feature_config.json
+        - outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/dfs_feature_manifest.csv
+      - dataset: rel-ratebeer
+        task: user-count
+        program_id: baseline_corrected_canonical
+        primitive_id: baseline::numeric_std
+        source_table: user_count_baseline_corrected_canonical
+        source_column: f_beer_ratings_aroma_std
+        output_column: f_beer_ratings_aroma_std
+        status: proven
+        notes:
+        - src/fdhg/compiler/existing_backend.py:RATEBEER_BASELINE_BINDINGS
+        - outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/dfs_feature_config.json
+        - outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/dfs_feature_manifest.csv
+      - dataset: rel-ratebeer
+        task: user-count
+        program_id: baseline_corrected_canonical
+        primitive_id: baseline::numeric_max
+        source_table: user_count_baseline_corrected_canonical
+        source_column: f_beer_ratings_aroma_max
+        output_column: f_beer_ratings_aroma_max
+        status: proven
+        notes:
+        - src/fdhg/compiler/existing_backend.py:RATEBEER_BASELINE_BINDINGS
+        - outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/dfs_feature_config.json
+        - outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/dfs_feature_manifest.csv
+      - dataset: rel-ratebeer
+        task: user-count
+        program_id: baseline_corrected_canonical
+        primitive_id: baseline::days_since_last
+        source_table: user_count_baseline_corrected_canonical
+        source_column: f_beer_ratings_days_since_last
+        output_column: f_beer_ratings_days_since_last
+        status: proven
+        notes:
+        - src/fdhg/compiler/existing_backend.py:RATEBEER_BASELINE_BINDINGS
+        - outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/dfs_feature_config.json
+        - outputs/e2e/rel-ratebeer_user-count/dfs_corrected_canonical/dfs_feature_manifest.csv

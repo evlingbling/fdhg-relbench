@@ -1,0 +1,28 @@
+{
+  "tasks": {
+    "rel-trial/studies-enrollment": {
+      "problem_type": "regression",
+      "primary_metric": "rmse",
+      "metric_direction": "lower",
+      "child_table": "sponsors_studies",
+      "child_fk": "nct_id",
+      "child_event_time_col": "date"
+    },
+    "rel-trial/study-adverse": {
+      "problem_type": "regression",
+      "primary_metric": "rmse",
+      "metric_direction": "lower",
+      "child_table": "sponsors_studies",
+      "child_fk": "nct_id",
+      "child_event_time_col": "date"
+    },
+    "rel-trial/study-outcome": {
+      "problem_type": "binary_classification",
+      "primary_metric": "roc_auc",
+      "metric_direction": "higher",
+      "child_table": "sponsors_studies",
+      "child_fk": "nct_id",
+      "child_event_time_col": "date"
+    }
+  }
+}

@@ -1,0 +1,94 @@
+rel-ratebeer/user-count:
+  horizon_days: 90
+  feature_budget: 20
+  primary_metric: rmse
+  secondary_metric: mae
+  metric_direction: lower
+  seeds:
+  - 41
+  - 42
+  - 43
+  - 44
+rel-ratebeer/user-churn:
+  horizon_days: 90
+  feature_budget: 20
+  primary_metric: roc_auc
+  secondary_metric: average_precision
+  metric_direction: higher
+  seeds:
+  - 41
+  - 42
+  - 43
+  - 44
+rel-ratebeer/beer-churn:
+  horizon_days: 90
+  feature_budget: 20
+  primary_metric: roc_auc
+  secondary_metric: average_precision
+  metric_direction: higher
+  seeds:
+  - 41
+  - 42
+  - 43
+  - 44
+rel-salt/sales-group:
+  feature_budget: 20
+  primary_metric: accuracy
+  secondary_metric: macro_f1
+  metric_direction: higher
+  seeds:
+  - 41
+  - 42
+  - 43
+  - 44
+rel-salt/item-shippoint:
+  feature_budget: 20
+  primary_metric: accuracy
+  secondary_metric: macro_f1
+  metric_direction: higher
+  seeds:
+  - 41
+  - 42
+  - 43
+  - 44
+rel-arxiv/author-category:
+  feature_budget: 20
+  primary_metric: accuracy
+  secondary_metric: macro_f1
+  metric_direction: higher
+  seeds:
+  - 41
+  - 42
+  - 43
+  - 44
+
+rel-ratebeer/user-place-liked_pairwise:
+  horizon_days: 90
+  feature_budget: 32
+  primary_metric: roc_auc
+  secondary_metric: average_precision
+  metric_direction: higher
+  seeds:
+    - 41
+    - 42
+    - 43
+    - 44
+  pairwise:
+    left_key: user_id
+    right_key: place_id
+    target_right_key: candidate_place_id
+    left_history:
+      table: beer_ratings
+      key: user_id
+      related_col: beer_id
+      time_col: updated_at
+    right_history:
+      table: place_ratings
+      key: place_id
+      related_col: user_id
+      time_col: created_at
+    pair_history:
+      table: place_ratings
+      left_key: user_id
+      right_key: place_id
+      time_col: created_at

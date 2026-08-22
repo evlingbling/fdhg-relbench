@@ -1,0 +1,63 @@
+dataset: relbench-v1-rel-ratebeer
+split:
+  source: relbench
+  strategy: official_pre_split
+  test_split_accessed: false
+  train_split_name: train
+  train_target_path: ../../data/relbench-v1/rel-ratebeer/user-count/target_train.parquet
+  validation_split_name: val
+  validation_target_path: ../../data/relbench-v1/rel-ratebeer/user-count/target_validation.parquet
+tables:
+  availability:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/availability.parquet
+    primary_key: avail_id
+  beer_ratings:
+    event_time_col: created_at
+    foreign_keys:
+    - column: user_id
+      references:
+        column: user_id
+        table: users
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/beer_ratings.parquet
+    primary_key: rating_id
+  beer_styles:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/beer_styles.parquet
+    primary_key: style_id
+  beer_upcs:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/beer_upcs.parquet
+  beers:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/beers.parquet
+    primary_key: beer_id
+  brewers:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/brewers.parquet
+    primary_key: brewer_id
+  countries:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/countries.parquet
+    primary_key: country_id
+  favorites:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/favorites.parquet
+    primary_key: favorite_id
+  place_ratings:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/place_ratings.parquet
+    primary_key: rating_id
+  place_types:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/place_types.parquet
+    primary_key: type_id
+  places:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/places.parquet
+    primary_key: place_id
+  states:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/states.parquet
+    primary_key: state_id
+  users:
+    path: ../../data/relbench-v1/rel-ratebeer/user-count/tables/users.parquet
+    primary_key: user_id
+task:
+  entity_key: user_id
+  label_col: num_ratings
+  metric_direction: lower
+  primary_metric: rmse
+  problem_type: regression
+  target_table: users
+  target_time_col: timestamp
+  task_id: user-count

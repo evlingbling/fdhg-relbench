@@ -1,0 +1,586 @@
+tasks:
+  rel-trial/study-outcome:
+    dfs:
+      child_table: sponsors_studies
+      child_fk: nct_id
+      child_time_col: date
+  rel-event/event_interest-interested:
+    problem_type: binary
+    label_col: interested
+    target:
+      primary_key_col: primary_key
+      entity_key: user
+      source_table: event_interest
+      source_entity_col: user
+      time_col: timestamp
+      verify_label_col: interested
+    dfs:
+      child_table: event_interest
+      numeric_col: user
+      max_train: 14442
+      max_val: 2000
+    afd:
+      entity_table: users
+      entity_table_key: user_id
+      columns:
+      - locale
+      - birthyear
+      - gender
+      - joinedAt
+      - location
+      - timezone
+    evaluation:
+      drop_cols:
+      - timestamp
+      - primary_key
+      - user
+      - f_event_interest_count
+  rel-hm/transactions-price:
+    problem_type: regression
+    label_col: price
+    target:
+      primary_key_col: primary_key
+      entity_key: article_id
+      source_table: transactions
+      source_entity_col: article_id
+      time_col: t_dat
+      verify_label_col: price
+    dfs:
+      child_table: transactions
+      numeric_col: sales_channel_value
+      max_train: 10000
+      max_val: 2000
+    evaluation:
+      drop_cols:
+      - t_dat
+      - primary_key
+      - article_id
+      - f_transactions_days_since_last
+    table_aliases:
+      transactions:
+        sales_channel_value: sales_channel_id
+    afd:
+      entity_table: article
+      entity_table_key: article_id
+      columns:
+      - index_group_no
+      - index_group_name
+  rel-ratebeer/beer_ratings-total_score:
+    problem_type: regression
+    label_col: total_score
+    dfs:
+      child_table: beer_ratings
+      numeric_col: aroma_history_value
+      max_train: 10000
+      max_val: 2000
+    evaluation:
+      drop_cols:
+      - created_at
+      - rating_id
+      - beer_id
+    target:
+      primary_key_col: rating_id
+      entity_key: beer_id
+      source_table: beer_ratings
+      source_entity_col: beer_id
+      time_col: created_at
+      verify_label_col: total_score
+    fallback_to_dfs: true
+  rel-arxiv/paper-citation:
+    builder: arxiv_paper_citation
+    inspect_task: paper-citation
+    problem_type: binary
+    label_col: cited
+    target:
+      entity_key: Paper_ID
+      time_col: date
+    dfs:
+      max_train: 10000
+      max_val: 2000
+    evaluation:
+      drop_cols:
+      - __row_id
+      - date
+      - Paper_ID
+    fallback_to_dfs: true
+  rel-arxiv/author-category:
+    builder: arxiv_author_category
+    inspect_task: author-category
+    problem_type: multiclass
+    label_col: primary_category
+    target:
+      entity_key: Author_ID
+      time_col: date
+    dfs:
+      max_train: 10000
+      max_val: 2000
+    evaluation:
+      drop_cols:
+      - __row_id
+      - date
+      - Author_ID
+  rel-ratebeer/user-place-liked_pairwise:
+    builder: ratebeer_user_place_pairwise
+    inspect_task: user-place-liked
+    problem_type: binary
+    label_col: label
+    target:
+      entity_key: user_id
+      time_col: timestamp
+    dfs:
+      child_table: beer_ratings
+      child_time_col: updated_at
+      numeric_col: aroma
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: availability
+      entity_table_key: user_id
+      add_entity_alias: false
+      max_rows: 50000
+      columns:
+      - avail_id
+      - beer_id
+      - place_id
+      - postal_code
+      - state_id
+      - country_id
+      - created_at
+      - user_id
+      - is_in_bottle
+      - is_on_tap
+      - is_out
+      exclude_columns: []
+    pairwise:
+      neg_per_pos: 1
+    evaluation:
+      drop_cols:
+      - timestamp
+      - user_id
+      - place_id
+    fallback_to_dfs: true
+  rel-ratebeer/beer-churn:
+    builder: generic_dfs
+    inspect_task: beer-churn
+    problem_type: binary
+    label_col: rating_churn
+    target:
+      entity_key: beer_id
+      time_col: timestamp
+    dfs:
+      child_table: beer_ratings
+      child_time_col: updated_at
+      numeric_col: aroma
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: availability
+      entity_table_key: beer_id
+      add_entity_alias: false
+      max_rows: 50000
+      columns: &id001
+      - avail_id
+      - beer_id
+      - place_id
+      - postal_code
+      - state_id
+      - country_id
+      - created_at
+      - user_id
+      - is_in_bottle
+      - is_on_tap
+      - is_out
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - timestamp
+      - beer_id
+    expected_gate: select
+  rel-ratebeer/brewer-dormant:
+    builder: generic_dfs
+    inspect_task: brewer-dormant
+    problem_type: binary
+    label_col: dormant
+    target:
+      entity_key: brewer_id
+      time_col: timestamp
+    dfs:
+      child_table: beers
+      child_time_col: created_at
+      numeric_col: alcohol_pct
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: brewers
+      entity_table_key: brewer_id
+      add_entity_alias: false
+      max_rows: 50000
+      columns:
+      - brewer_id
+      - name
+      - description
+      - name_plain
+      - address
+      - city
+      - state_id
+      - country_id
+      - zip_code
+      - type_id
+      - website
+      - facebook
+      - twitter
+      - email
+      - phone
+      - barrels
+      - opened_at
+      - created_at
+      - created_by
+      - updated_at
+      - beer_jobber_id
+      - has_logo
+      - view_count
+      - score
+      - is_out_of_business
+      - out_of_business_date
+      - is_retired
+      - area_code
+      - hours
+      - metro_id
+      - region_id
+      - admin_note
+      - msrepl_tran_version
+      - updated_by
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - timestamp
+      - brewer_id
+    expected_gate: fallback
+  rel-ratebeer/user-churn:
+    builder: generic_dfs
+    inspect_task: user-churn
+    problem_type: binary
+    label_col: user_churn
+    target:
+      entity_key: user_id
+      time_col: timestamp
+    dfs:
+      child_table: beer_ratings
+      child_time_col: updated_at
+      numeric_col: aroma
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: availability
+      entity_table_key: user_id
+      add_entity_alias: false
+      max_rows: 50000
+      columns: *id001
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - timestamp
+      - user_id
+    expected_gate: fallback
+  rel-ratebeer/user-count:
+    builder: generic_dfs
+    inspect_task: user-count
+    problem_type: regression
+    label_col: num_ratings
+    target:
+      entity_key: user_id
+      time_col: timestamp
+    dfs:
+      child_table: beer_ratings
+      child_time_col: updated_at
+      numeric_col: aroma
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: availability
+      entity_table_key: user_id
+      add_entity_alias: false
+      max_rows: 50000
+      columns: *id001
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - timestamp
+      - user_id
+    expected_gate: select
+  rel-salt/item-incoterms:
+    builder: generic_dfs
+    inspect_task: item-incoterms
+    problem_type: multiclass
+    label_col: ITEMINCOTERMSCLASSIFICATION
+    target:
+      entity_key: ID
+      time_col: CREATIONTIMESTAMP
+    dfs:
+      child_table: salesdocumentitem
+      child_time_col: CREATIONTIMESTAMP
+      numeric_col: SHIPPINGPOINT
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: salesdocumentitem
+      entity_table_key: ID
+      add_entity_alias: false
+      max_rows: 50000
+      columns: &id002
+      - SALESDOCUMENT
+      - SALESDOCUMENTITEM
+      - PLANT
+      - SHIPPINGPOINT
+      - SALESDOCUMENTITEMCATEGORY
+      - PRODUCT
+      - SOLDTOPARTY
+      - SHIPTOPARTY
+      - BILLTOPARTY
+      - PAYERPARTY
+      - ITEMINCOTERMSCLASSIFICATION
+      - CREATIONTIMESTAMP
+      - ID
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - CREATIONTIMESTAMP
+      - ID
+    expected_gate: fallback
+  rel-salt/item-plant:
+    builder: generic_dfs
+    inspect_task: item-plant
+    problem_type: multiclass
+    label_col: PLANT
+    target:
+      entity_key: ID
+      time_col: CREATIONTIMESTAMP
+    dfs:
+      child_table: salesdocumentitem
+      child_time_col: CREATIONTIMESTAMP
+      numeric_col: SHIPPINGPOINT
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: salesdocumentitem
+      entity_table_key: ID
+      add_entity_alias: false
+      max_rows: 50000
+      columns: *id002
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - CREATIONTIMESTAMP
+      - ID
+    expected_gate: fallback
+  rel-salt/item-shippoint:
+    builder: generic_dfs
+    inspect_task: item-shippoint
+    problem_type: multiclass
+    label_col: SHIPPINGPOINT
+    target:
+      entity_key: ID
+      time_col: CREATIONTIMESTAMP
+    dfs:
+      child_table: salesdocumentitem
+      child_time_col: CREATIONTIMESTAMP
+      numeric_col: PLANT
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: salesdocumentitem
+      entity_table_key: ID
+      add_entity_alias: false
+      max_rows: 50000
+      columns: *id002
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - CREATIONTIMESTAMP
+      - ID
+    expected_gate: select
+  rel-salt/sales-group:
+    builder: generic_dfs
+    inspect_task: sales-group
+    problem_type: multiclass
+    label_col: SALESGROUP
+    target:
+      entity_key: SALESDOCUMENT
+      time_col: CREATIONTIMESTAMP
+    dfs:
+      child_table: salesdocument
+      child_time_col: CREATIONTIMESTAMP
+      numeric_col: SALESOFFICE
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: salesdocument
+      entity_table_key: SALESDOCUMENT
+      add_entity_alias: false
+      max_rows: 50000
+      columns: &id003
+      - SALESDOCUMENT
+      - SALESOFFICE
+      - SALESGROUP
+      - CUSTOMERPAYMENTTERMS
+      - SHIPPINGCONDITION
+      - SALESDOCUMENTTYPE
+      - SALESORGANIZATION
+      - DISTRIBUTIONCHANNEL
+      - ORGANIZATIONDIVISION
+      - BILLINGCOMPANYCODE
+      - TRANSACTIONCURRENCY
+      - HEADERINCOTERMSCLASSIFICATION
+      - CREATIONTIMESTAMP
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - CREATIONTIMESTAMP
+      - SALESDOCUMENT
+      backend: catboost
+      task_type: multiclass
+    expected_gate: select
+  rel-salt/sales-incoterms:
+    builder: generic_dfs
+    inspect_task: sales-incoterms
+    problem_type: multiclass
+    label_col: HEADERINCOTERMSCLASSIFICATION
+    target:
+      entity_key: SALESDOCUMENT
+      time_col: CREATIONTIMESTAMP
+    dfs:
+      child_table: salesdocument
+      child_time_col: CREATIONTIMESTAMP
+      numeric_col: SALESOFFICE
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: salesdocument
+      entity_table_key: SALESDOCUMENT
+      add_entity_alias: false
+      max_rows: 50000
+      columns: *id003
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - CREATIONTIMESTAMP
+      - SALESDOCUMENT
+    expected_gate: select
+  rel-salt/sales-office:
+    builder: generic_dfs
+    inspect_task: sales-office
+    problem_type: multiclass
+    label_col: SALESOFFICE
+    target:
+      entity_key: SALESDOCUMENT
+      time_col: CREATIONTIMESTAMP
+    dfs:
+      child_table: salesdocument
+      child_time_col: CREATIONTIMESTAMP
+      numeric_col: SALESOFFICE
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: salesdocument
+      entity_table_key: SALESDOCUMENT
+      add_entity_alias: false
+      max_rows: 50000
+      columns: *id003
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - CREATIONTIMESTAMP
+      - SALESDOCUMENT
+    expected_gate: select
+  rel-salt/sales-payterms:
+    builder: generic_dfs
+    inspect_task: sales-payterms
+    problem_type: multiclass
+    label_col: CUSTOMERPAYMENTTERMS
+    target:
+      entity_key: SALESDOCUMENT
+      time_col: CREATIONTIMESTAMP
+    dfs:
+      child_table: salesdocument
+      child_time_col: CREATIONTIMESTAMP
+      numeric_col: SALESOFFICE
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: salesdocument
+      entity_table_key: SALESDOCUMENT
+      add_entity_alias: false
+      max_rows: 50000
+      columns: *id003
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - CREATIONTIMESTAMP
+      - SALESDOCUMENT
+    expected_gate: select
+  rel-salt/sales-shipcond:
+    builder: generic_dfs
+    inspect_task: sales-shipcond
+    problem_type: multiclass
+    label_col: SHIPPINGCONDITION
+    target:
+      entity_key: SALESDOCUMENT
+      time_col: CREATIONTIMESTAMP
+    dfs:
+      child_table: salesdocument
+      child_time_col: CREATIONTIMESTAMP
+      numeric_col: SALESOFFICE
+      max_train: 10000
+      max_val: 2000
+    afd:
+      entity_table: salesdocument
+      entity_table_key: SALESDOCUMENT
+      add_entity_alias: false
+      max_rows: 50000
+      columns: *id003
+      exclude_columns: []
+    evaluation:
+      drop_cols:
+      - CREATIONTIMESTAMP
+      - SALESDOCUMENT
+    expected_gate: select
+  rel-avito/ad-ctr:
+    dfs:
+      child_table: SearchStream
+      child_fk: AdID
+      child_time_col: SearchDate
+      numeric_col: HistCTR
+  rel-avito/searchinfo-isuserloggedon:
+    dfs:
+      child_table: SearchStream
+      child_fk: SearchID
+      child_time_col: SearchDate
+      numeric_col: Position
+  rel-f1/driver-dnf:
+    dfs:
+      child_table: results
+      child_fk: driverId
+      child_time_col: date
+      numeric_col: laps
+  rel-f1/driver-position:
+    dfs:
+      child_table: results
+      child_fk: driverId
+      child_time_col: date
+      numeric_col: positionOrder
+  rel-f1/driver-top3:
+    dfs:
+      child_table: results
+      child_fk: driverId
+      child_time_col: date
+      numeric_col: positionOrder
+  rel-trial/studies-enrollment:
+    dfs:
+      child_table: sponsors_studies
+      child_fk: nct_id
+      child_time_col: date
+  rel-trial/study-adverse:
+    dfs:
+      child_table: sponsors_studies
+      child_fk: nct_id
+      child_time_col: date

@@ -1,0 +1,52 @@
+dataset: relbench-v1-rel-f1
+split:
+  source: relbench
+  strategy: official_pre_split
+  test_split_accessed: false
+  train_split_name: train
+  train_target_path: ../../data/relbench-v1/rel-f1/driver-position/target_train.parquet
+  validation_split_name: val
+  validation_target_path: ../../data/relbench-v1/rel-f1/driver-position/target_validation.parquet
+tables:
+  circuits:
+    path: ../../data/relbench-v1/rel-f1/driver-position/tables/circuits.parquet
+    primary_key: circuitId
+  constructor_results:
+    path: ../../data/relbench-v1/rel-f1/driver-position/tables/constructor_results.parquet
+    primary_key: constructorResultsId
+  constructor_standings:
+    path: ../../data/relbench-v1/rel-f1/driver-position/tables/constructor_standings.parquet
+    primary_key: constructorStandingsId
+  constructors:
+    path: ../../data/relbench-v1/rel-f1/driver-position/tables/constructors.parquet
+    primary_key: constructorId
+  drivers:
+    path: ../../data/relbench-v1/rel-f1/driver-position/tables/drivers.parquet
+    primary_key: driverId
+  qualifying:
+    path: ../../data/relbench-v1/rel-f1/driver-position/tables/qualifying.parquet
+    primary_key: qualifyId
+  races:
+    path: ../../data/relbench-v1/rel-f1/driver-position/tables/races.parquet
+    primary_key: raceId
+  results:
+    event_time_col: date
+    foreign_keys:
+    - column: driverId
+      references:
+        column: driverId
+        table: drivers
+    path: ../../data/relbench-v1/rel-f1/driver-position/tables/results.parquet
+    primary_key: resultId
+  standings:
+    path: ../../data/relbench-v1/rel-f1/driver-position/tables/standings.parquet
+    primary_key: driverStandingsId
+task:
+  entity_key: driverId
+  label_col: position
+  metric_direction: lower
+  primary_metric: rmse
+  problem_type: regression
+  target_table: drivers
+  target_time_col: date
+  task_id: driver-position

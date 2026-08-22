@@ -1,0 +1,28 @@
+experiment:
+  seeds: [41, 42, 43, 44]
+  max_train_rows: 10000
+  max_validation_rows: 2000
+
+features:
+  baseline: dfs
+  candidate: fdhg_dmax1
+  ambiguity_operators:
+    - majority_confidence
+    - entropy
+    - conflict_count
+    - support_count
+  include_missing_indicators: true
+
+afd:
+  max_depth: 1
+  uniqueness_penalty: true
+  max_selected_edges: 1
+
+validation_gate:
+  classification_metric: auroc
+  regression_metric: rmse
+  require_improvement_on_all_seeds: true
+  fallback_variant: dfs
+
+decoder:
+  primary: tabpfn

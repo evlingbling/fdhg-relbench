@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "rel-amazon/item-churn": {
+      "problem_type": "binary_classification",
+      "primary_metric": "roc_auc",
+      "metric_direction": "higher"
+    }
+  }
+}

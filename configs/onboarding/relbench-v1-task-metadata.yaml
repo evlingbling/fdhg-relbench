@@ -1,0 +1,29 @@
+tasks:
+  rel-ratebeer/user-count:
+    entity_key: user_id
+    target_table: users
+    target_time_col: timestamp
+    label_col: num_ratings
+    problem_type: regression
+    primary_metric: rmse
+    metric_direction: lower
+    child_table: beer_ratings
+    child_fk: user_id
+    child_event_time_col: created_at
+  rel-f1/driver-position:
+    primary_metric: rmse
+    metric_direction: lower
+    child_table: results
+    child_fk: driverId
+    child_event_time_col: date
+  rel-stack/user-badge:
+    primary_metric: roc_auc
+    metric_direction: higher
+    problem_type: binary_classification
+    entity_key: UserId
+    target_table: users
+    target_time_col: timestamp
+    label_col: WillGetBadge
+    child_table: posts
+    child_fk: OwnerUserId
+    child_event_time_col: CreationDate

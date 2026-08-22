@@ -1,0 +1,98 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+outputs/
+logs/
+artifacts/
+/data/
+.cache/
+
+*.parquet
+*.pkl
+*.joblib
+*.tar
+*.tar.gz
+*.zip
+
+.env
+.env.*
+.DS_Store
+
+# Large generated relational artifacts
+outputs/e2e/
+**/inspect/
+**/inspect_enriched/
+**/*.parquet
+
+# Local caches and model artifacts
+.cache/
+cache/
+wandb/
+**/*.pkl
+**/*.joblib
+**/*.pt
+**/*.ckpt
+
+# Local experiment backups and logs
+*.bak_*
+*.log
+
+# Runtime metadata from official GNN sweeps
+results/official_relbench_gnn/status/*.status
+
+# Runtime metadata from official GNN sweeps
+results/official_relbench_gnn/status/*.status
+
+# Local caches and raw datasets
+.cache/
+**/.cache/
+relbench-forum-raw.zip
+*.prof
+
+# Temporary and backup files
+*.bak
+*.zeroed
+*.before_*
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# Large generated backups
+results/backups/
+.fdhg/experiments.db
+.env.fdhg
+
+# Generated experiment artifacts
+outputs/
+results/
+logs/
+paper/results/*
+!paper/results/.gitkeep
+
+# Local experiment registry
+.fdhg/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments / editors
+.env
+.env.*
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Keep the paper result directory in the repository
+!paper/results/
+paper/results/*
+!paper/results/.gitkeep

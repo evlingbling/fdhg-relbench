@@ -1,0 +1,33 @@
+dataset: coldstart-shop
+
+relation_threshold: 1.0
+
+tables:
+  customers:
+    path: ../../data/coldstart-shop/customers.parquet
+    primary_key: customer_id
+
+  events:
+    path: ../../data/coldstart-shop/events.parquet
+    primary_key: event_id
+    event_time_col: created_at
+    foreign_keys:
+      - column: customer_id
+        references:
+          table: customers
+          column: customer_id
+
+task:
+  task_id: customer-value
+  target_table: customers
+  entity_key: customer_id
+  target_time_col: prediction_time
+  label_col: future_value
+  problem_type: regression
+  primary_metric: rmse
+  metric_direction: lower
+
+split:
+  strategy: temporal
+  train_end: "2026-01-30"
+  validation_end: "2026-02-09"
