@@ -10,31 +10,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-DB = ROOT / ".fdhg" / "experiments.db"
+DEFAULT_DB = ROOT / ".fdhg" / "experiments.db"
 
-SEARCH_ROOTS = [
+DEFAULT_SEARCH_ROOTS = [
     ROOT / "outputs" / "final-gate-51task-v2",
-    ROOT / "outputs" / "final-gate-51task-v2-worker0",
-    ROOT / "outputs" / "final-gate-51task-v2-worker1",
 ]
 
-OUT_ROOT = (
+DEFAULT_OUT_ROOT = (
     ROOT
     / "outputs"
     / "predictor-generalization"
-)
-
-MANIFEST = (
-    OUT_ROOT
-    / "evaluation_manifest.csv"
 )
 
 SEEDS = [41, 42, 43, 44]
 PREDICTORS = ["xgboost", "catboost"]
 
 
-def load_completed():
-    con = sqlite3.connect(DB)
+def load_completed(db_path):
+    con = sqlite3.connect(db_path)
     con.row_factory = sqlite3.Row
 
     rows = con.execute(
@@ -68,12 +61,12 @@ def load_completed():
     return list(unique.values())
 
 
-def find_joint(dataset, task):
+def find_joint(dataset, task, search_roots):
     slug = f"{dataset}_{task}"
 
     candidates = []
 
-    for root in SEARCH_ROOTS:
+    for root in search_roots:
         path = (
             root
             / slug
@@ -317,9 +310,45 @@ def main():
         action="store_true",
     )
 
+    ap.add_argument(
+        "--db",
+        type=Path,
+        default=DEFAULT_DB,
+        help=(
+            "Experiment registry SQLite database "
+            "(default: .fdhg/experiments.db)"
+        ),
+    )
+
+    ap.add_argument(
+        "--search-root",
+        type=Path,
+        action="append",
+        default=None,
+        help=(
+            "Final-gate artifact root containing per-task outputs. "
+            "May be specified multiple times."
+        ),
+    )
+
+    ap.add_argument(
+        "--output-root",
+        type=Path,
+        default=DEFAULT_OUT_ROOT,
+        help=(
+            "Directory for predictor-generalization artifacts."
+        ),
+    )
+
     args = ap.parse_args()
 
-    rows = load_completed()
+    search_roots = (
+        args.search_root
+        if args.search_root
+        else DEFAULT_SEARCH_ROOTS
+    )
+
+    rows = load_completed(args.db)
 
     print()
     print(
@@ -355,6 +384,7 @@ def main():
         joint_path = find_joint(
             dataset,
             task,
+            search_roots,
         )
 
         if joint_path is None:
@@ -573,9 +603,14 @@ def main():
 
     if args.write_manifest:
 
-        OUT_ROOT.mkdir(
+        args.output_root.mkdir(
             parents=True,
             exist_ok=True,
+        )
+
+        manifest_path = (
+            args.output_root
+            / "evaluation_manifest.csv"
         )
 
         fieldnames = [
@@ -597,7 +632,7 @@ def main():
             "preflight_status",
         ]
 
-        with MANIFEST.open(
+        with manifest_path.open(
             "w",
             newline="",
         ) as f:
@@ -614,7 +649,7 @@ def main():
 
         print()
         print(
-            f"WROTE_MANIFEST={MANIFEST}"
+            f"WROTE_MANIFEST={manifest_path}"
         )
 
     # Important:

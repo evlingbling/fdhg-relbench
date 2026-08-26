@@ -68,6 +68,7 @@ class AutoFdhgOptions:
     continuous_fdhg_bins: int = 8
     continuous_fdhg_min_effective_bins: int = 2
     fdhg_candidate_edges_file: Path | None = None
+    force_final_variant: str | None = None
 
 
 @dataclass(frozen=True)
@@ -269,6 +270,10 @@ def prepare_auto_fdhg(
     dfs_features = list(dfs_resolution["features"])
     if options.edge_selection_strategy not in {"independent", "greedy", "greedy_backward"}:
         raise ValueError(f"unsupported_edge_selection_strategy:{options.edge_selection_strategy}")
+    if options.force_final_variant not in {None, "dfs_fallback", "auto_only", "auto_plus_fdhg"}:
+        raise ValueError(
+            f"unsupported_force_final_variant:{options.force_final_variant}"
+        )
     if options.edge_screening_rule not in {"fixed_count", "positive_fraction", "pooled_oof"}:
         raise ValueError(f"unsupported_edge_screening_rule:{options.edge_screening_rule}")
     if not (0.0 < float(options.edge_screening_min_positive_fraction) <= 1.0):
@@ -358,10 +363,15 @@ def prepare_auto_fdhg(
                 target_lookup_value_mapping
             ),
         )
+        final_selected_variant = (
+            options.force_final_variant
+            if options.force_final_variant is not None
+            else gate["selected_variant"]
+        )
         final = final_refit_and_evaluate(
             dataset_name=dataset_name,
             task_name=task_name,
-            selected_variant=gate["selected_variant"],
+            selected_variant=final_selected_variant,
             train_targets=train_df,
             validation_targets=val_df,
             table_dict=table_dict,
@@ -565,6 +575,15 @@ def prepare_auto_fdhg(
         "fold_boundaries": _public_folds(split_plan),
         "workload": workload,
         "selected_variant": gate["selected_variant"],
+        "gate_selected_variant": gate["selected_variant"],
+        "final_evaluated_variant": (
+            options.force_final_variant
+            if options.force_final_variant is not None
+            else gate["selected_variant"]
+        ),
+        "forced_final_evaluation": bool(
+            options.force_final_variant is not None
+        ),
         "mean_scores": gate["mean_scores"],
         "fdhg_declared_residual_features": gate.get("fdhg_declared_residual_features", 0),
         "fdhg_usable_residual_features_by_fold": gate.get("fdhg_usable_residual_features_by_fold", {}),

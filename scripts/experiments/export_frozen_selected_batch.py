@@ -79,6 +79,17 @@ def main():
             "frozen-matrices"
         ),
     )
+    ap.add_argument(
+        "--output-root",
+        type=Path,
+        default=Path(
+            "outputs/final-gate-51task-v2"
+        ),
+        help=(
+            "Final-gate artifact root used as the "
+            "source for frozen selected matrices."
+        ),
+    )
 
     ap.add_argument(
         "--write",
@@ -92,10 +103,9 @@ def main():
 
     print("SNAPSHOT_ROWS =", len(rows))
 
-    if len(rows) != 36:
+    if not rows:
         raise SystemExit(
-            f"REFUSING: expected 36 rows, "
-            f"found {len(rows)}"
+            "REFUSING: snapshot contains zero rows"
         )
 
     todo = []
@@ -155,6 +165,8 @@ def main():
             dataset,
             "--task",
             task,
+            "--output-root",
+            str(args.output_root),
             "--export-root",
             str(args.export_root),
             "--write",

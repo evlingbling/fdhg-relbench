@@ -995,7 +995,7 @@ def describe_path(path: Path) -> str:
 
 def remote_read_only_command() -> str:
     return (
-        "cd /home/evelyn/fdhg-icl-paper && "
+        'cd "${REPO_ROOT:-$(git rev-parse --show-toplevel)}" && '
         "micromamba run -n fdhg310 python - <<'PY'\n"
         "from pathlib import Path\n"
         "import hashlib\n"

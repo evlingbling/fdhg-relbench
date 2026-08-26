@@ -3132,3 +3132,120 @@ def test_event_relation_preserves_dbinfer_inverse_lookup_transform(
         relation["target_lookup_value_transform"]
         == "dbinfer_inverse_entity_mapping"
     )
+
+
+@pytest.mark.parametrize(
+    "forced_variant",
+    [
+        None,
+        "dfs_fallback",
+        "auto_only",
+        "auto_plus_fdhg",
+    ],
+)
+def test_force_final_variant_accepts_supported_values(
+    tmp_path: Path,
+    forced_variant: str | None,
+) -> None:
+    auto_root, dfs_root = write_artifacts(tmp_path)
+
+    prepared = prepare_auto_fdhg(
+        dataset_name="rel-f1",
+        task_name="driver-position",
+        output_root=tmp_path / "out",
+        download=False,
+        auto_output_root=auto_root,
+        dfs_source_root=dfs_root,
+        options=AutoFdhgOptions(
+            selection_folds=3,
+            max_fdhg_edges=2,
+            force_final_variant=forced_variant,
+        ),
+        object_loader=loader,
+        include_gate=True,
+    )
+
+    assert not prepared["blockers"]
+
+
+def test_force_final_variant_rejects_unsupported_value(
+    tmp_path: Path,
+) -> None:
+    auto_root, dfs_root = write_artifacts(tmp_path)
+
+    with pytest.raises(
+        ValueError,
+        match="unsupported_force_final_variant:not_a_variant",
+    ):
+        prepare_auto_fdhg(
+            dataset_name="rel-f1",
+            task_name="driver-position",
+            output_root=tmp_path / "out",
+            download=False,
+            auto_output_root=auto_root,
+            dfs_source_root=dfs_root,
+            options=AutoFdhgOptions(
+                selection_folds=3,
+                max_fdhg_edges=2,
+                force_final_variant="not_a_variant",
+            ),
+            object_loader=loader,
+            include_gate=True,
+        )
+
+
+def test_force_final_variant_preserves_gate_decision_in_manifest(
+    tmp_path: Path,
+) -> None:
+    auto_root, dfs_root = write_artifacts(tmp_path)
+
+    prepared = prepare_auto_fdhg(
+        dataset_name="rel-f1",
+        task_name="driver-position",
+        output_root=tmp_path / "out",
+        download=False,
+        auto_output_root=auto_root,
+        dfs_source_root=dfs_root,
+        options=AutoFdhgOptions(
+            selection_folds=3,
+            max_fdhg_edges=2,
+            force_final_variant="dfs_fallback",
+        ),
+        object_loader=loader,
+        include_gate=True,
+    )
+
+    gate_variant = prepared["gate"]["selected_variant"]
+    manifest = prepared["manifest"]
+
+    assert manifest["gate_selected_variant"] == gate_variant
+    assert manifest["final_evaluated_variant"] == "dfs_fallback"
+    assert manifest["forced_final_evaluation"] is True
+
+
+def test_default_final_variant_tracks_gate_decision(
+    tmp_path: Path,
+) -> None:
+    auto_root, dfs_root = write_artifacts(tmp_path)
+
+    prepared = prepare_auto_fdhg(
+        dataset_name="rel-f1",
+        task_name="driver-position",
+        output_root=tmp_path / "out",
+        download=False,
+        auto_output_root=auto_root,
+        dfs_source_root=dfs_root,
+        options=AutoFdhgOptions(
+            selection_folds=3,
+            max_fdhg_edges=2,
+        ),
+        object_loader=loader,
+        include_gate=True,
+    )
+
+    gate_variant = prepared["gate"]["selected_variant"]
+    manifest = prepared["manifest"]
+
+    assert manifest["gate_selected_variant"] == gate_variant
+    assert manifest["final_evaluated_variant"] == gate_variant
+    assert manifest["forced_final_evaluation"] is False
