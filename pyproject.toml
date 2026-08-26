@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "fdhg-icl"
 version = "0.1.0"
-description = "Schema-guided feature compilation for relational prediction with frozen tabular foundation models."
+description = "Automatic relational feature engineering with functional dependencies on RelBench."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
