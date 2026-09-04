@@ -53,6 +53,7 @@ The table below maps manuscript experiments to their reproduction entry points. 
 | Table 9 — Independent vs Greedy | `scripts/ablations/collect_independent_vs_greedy.py` | Aggregates the 15-task common support where both strategies produce non-empty FDHG augmentations. |
 | Table 10 — Random-K | `scripts/reproduce_ablations.sh` | Four representative tasks and 20 random subsets per task. |
 | Table 11 — Efficiency | `scripts/reproduce_efficiency.sh` | Reports runtime and peak-memory measurements. |
+| Table 1 Panel B — Selected vs Auto across predictors | `scripts/experiments/collect_selected_vs_auto_decoders.py` | Aggregates the frozen selected representation against its Auto counterfactual. The release-default fully reproducible path covers XGBoost, CatBoost, and HGB; additional predictors can be supplied when their decoder artifacts are available. |
 | Tables 14--15 — Predictor generalization | `scripts/reproduce_generalization.sh` | Reuses the frozen selected representation across downstream predictors. |
 
 The standard ablation wrapper excludes the two most computationally expensive ablations. To include them, run:
