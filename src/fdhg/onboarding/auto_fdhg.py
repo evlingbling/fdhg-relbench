@@ -64,6 +64,7 @@ class AutoFdhgOptions:
     edge_screening_max_relative_fold_degradation: float | None = None
     discover_fdhg_edges: bool = True
     edge_selection_strategy: str = "independent"
+    enable_pairwise_rescue: bool = True
     continuous_fdhg_mode: str = "exclude"
     continuous_fdhg_bins: int = 8
     continuous_fdhg_min_effective_bins: int = 2
@@ -1489,6 +1490,7 @@ def evaluate_joint_gate(
                 independent_screened_edges.append(dict(edge))
         if (
             options.edge_selection_strategy == "greedy"
+            and options.enable_pairwise_rescue
             and not independent_screened_edges
             and len(fdhg_edges) >= 2
         ):
@@ -2118,6 +2120,7 @@ def evaluate_joint_gate(
         ),
         "pairwise_rescue_reason": _pairwise_rescue_reason(
             strategy=options.edge_selection_strategy,
+            enabled=options.enable_pairwise_rescue,
             screened_edges=screened_edges,
             pair_screening_rows=pair_screening_rows,
         ),
@@ -2701,11 +2704,14 @@ def evaluate_pairwise_rescue(
 def _pairwise_rescue_reason(
     *,
     strategy: str,
+    enabled: bool,
     screened_edges: Sequence[Mapping[str, Any]],
     pair_screening_rows: Sequence[Mapping[str, Any]],
 ) -> str:
     if strategy != "greedy":
         return "not_greedy_strategy"
+    if not enabled:
+        return "disabled"
     if not pair_screening_rows:
         return "not_attempted_single_edge_passed" if screened_edges else "not_attempted_insufficient_candidates"
     if any(row.get("selected_initial_pair") for row in pair_screening_rows):

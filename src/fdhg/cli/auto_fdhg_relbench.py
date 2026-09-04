@@ -56,6 +56,20 @@ def main(argv: Sequence[str] | None = None) -> int:
         choices=("independent", "greedy", "greedy_backward"),
         default="independent",
     )
+    pairwise_rescue = parser.add_mutually_exclusive_group()
+    pairwise_rescue.add_argument(
+        "--enable-pairwise-rescue",
+        dest="enable_pairwise_rescue",
+        action="store_true",
+        default=True,
+        help="Enable Greedy pairwise initialization when no singleton passes.",
+    )
+    pairwise_rescue.add_argument(
+        "--disable-pairwise-rescue",
+        dest="enable_pairwise_rescue",
+        action="store_false",
+        help="Disable Greedy pairwise initialization (ablation option).",
+    )
     parser.add_argument(
         "--continuous-fdhg-mode",
         choices=("exclude", "quantile"),
@@ -118,6 +132,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 edge_screening_min_positive_fraction=args.edge_screening_min_positive_fraction,
                 edge_screening_max_relative_fold_degradation=args.edge_screening_max_relative_fold_degradation,
                 edge_selection_strategy=args.edge_selection_strategy,
+                enable_pairwise_rescue=args.enable_pairwise_rescue,
                 continuous_fdhg_mode=args.continuous_fdhg_mode,
                 continuous_fdhg_bins=args.continuous_fdhg_bins,
                 continuous_fdhg_min_effective_bins=args.continuous_fdhg_min_effective_bins,

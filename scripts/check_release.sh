@@ -5,15 +5,21 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 echo "===== MACHINE-SPECIFIC PATHS ====="
+
+scan_paths=(README.md configs scripts src tests)
+if [[ -d docs ]]; then
+  scan_paths+=(docs)
+fi
+
 if grep -RIn \
   --exclude-dir=.git \
   --exclude-dir=__pycache__ \
   --exclude=check_release.sh \
-  -E '/home/evelyn|/Users/evelyn|fdhg-icl-paper-greedy|fdhg-icl-paper' \
-  README.md docs configs scripts src tests
+  -E '/home/[^/]+/|/Users/[^/]+/' \
+  "${scan_paths[@]}"
 then
   echo
-  echo "ERROR: machine-specific/internal path found"
+  echo "ERROR: machine-specific absolute path found"
   exit 1
 fi
 echo "PASS"
