@@ -560,6 +560,14 @@ def main():
             ),
         "matrix_dir":
             str(matrix_dir),
+        "test_split_accessed":
+            bool(manifest["test_split_accessed"]),
+        "official_validation_was_used_for_selection":
+            bool(
+                manifest[
+                    "official_validation_used_for_selection"
+                ]
+            ),
     }
 
     nonconstant_feature_count = sum(
