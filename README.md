@@ -20,7 +20,7 @@ Main 51-task sweep:
 scripts/reproduce_main.sh
 ```
 
-Ablations (cross-fold consistency, Auto-budget sensitivity, Random-K):
+Ablations and artifact checks:
 
 ```bash
 ARTIFACT_ROOT=/path/to/preserved/paper/artifacts scripts/reproduce_ablations.sh
@@ -55,7 +55,7 @@ The table below maps manuscript experiments to their reproduction entry points. 
 | Table 11 — Efficiency | `scripts/reproduce_efficiency.sh` | Reports runtime and peak-memory measurements. |
 | Tables 14--15 — Predictor generalization | `scripts/reproduce_generalization.sh` | Reuses the frozen selected representation across downstream predictors. |
 
-The standard ablation wrapper excludes the two most expensive selector-search ablations. To include them, run:
+The standard ablation wrapper excludes the two most computationally expensive ablations. To include them, run:
 
 ```bash
 RUN_EXPENSIVE_ABLATIONS=1 \\
