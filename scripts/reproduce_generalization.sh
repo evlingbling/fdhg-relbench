@@ -40,7 +40,15 @@ python scripts/experiments/run_frozen_gbdt_batch.py \
   --write
 
 echo
-echo "===== 4. COMPLETENESS ====="
+echo "===== 4. DIRECT FROZEN HGB EVALUATION ====="
+
+python scripts/evaluate/evaluate_frozen_hgb.py \
+  --matrix-root "$FROZEN_ROOT" \
+  --output-root "${GENERALIZATION_ROOT}/hgb-frozen" \
+  --expect-completed "$EXPECT_COMPLETED"
+
+echo
+echo "===== 5. GBDT COMPLETENESS ====="
 
 python scripts/experiments/collect_predictor_generalization.py \
   --result-root "$RESULT_ROOT"

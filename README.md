@@ -38,7 +38,7 @@ Predictor generalization:
 scripts/reproduce_generalization.sh
 ```
 
-The generalization wrapper performs pre-flight validation, exports the frozen selected representation for each task, evaluates XGBoost and CatBoost over seeds 41--44, and verifies run completeness. Deterministic predictor limitations, such as CatBoost receiving an all-constant frozen design matrix, are recorded explicitly as structural skips rather than hidden as failures.
+The generalization wrapper performs pre-flight validation, exports the frozen selected representation for each task, evaluates XGBoost and CatBoost over seeds 41--44 and HistGradientBoosting directly on the same frozen matrices with its deterministic seed-0 configuration, and verifies run completeness. Deterministic predictor limitations, such as CatBoost receiving an all-constant frozen design matrix, are recorded explicitly as structural skips rather than hidden as failures.
 
 ## Paper-to-code map
 
